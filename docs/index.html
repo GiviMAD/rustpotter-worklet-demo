@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Rustpotter Web Demo!</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="description">
+    <div class="logo_container">
+      <img class="logo" src="logo.png">
+    </div>
+    <br>
+    <div class="text">
+      <span>This is a demo website for </span><a href="https://github.com/GiviMAD/rustpotter">Rustpotter</a><span>, a
+        free and open source wake word spotter forged in rust.</span>
+      <br>
+    </div>
+  </div>
+  <div class="wakeword-panel-outder">
+    <div id="wakeword_panel" class="wakeword-panel">
+      <span>Wakeword: </span>
+      <select disabled="true" id="wakeword_selector" class="wakeword-selector">
+      </select>
+      <div id="wakeword_input_container"></div>
+      <div class="range_container">
+        <label for="averaged_threshold">Averaged Threshold: </label>
+        <output>0.</output>
+        <input type="range" id="wakeword_avg_threshold" min="0" max="1" value="0" step="0.01"
+          oninput="this.previousElementSibling.value = this.value">
+      </div>
+      <div class="range_container">
+        <label for="threshold">Threshold: </label>
+        <output>0.5</output>
+        <input type="range" id="wakeword_threshold" min="0" max="1" value="0.5" step="0.01"
+          oninput="this.previousElementSibling.value = this.value">
+      </div>
+      <div class="check_container">
+        <input type="checkbox" id="eager_mode" name="eager_mode" checked="true" value="true">
+        <label for="eager_mode"> Eager Mode</label><br>
+      </div>
+      <div id="btn_panel" class="btn-panel">
+        <button id="record" disabled="true" type="button">Start Spotting</button>
+        <button id="pause" disabled="true" type="button">Pause Spotting</button>
+        <button id="stop" disabled="true" type="button">Stop Spotting</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <code id="terminal" contenteditable="false">
+    </code>
+  </div>
+  <div class="copyright">
+    <a href="https://github.com/GiviMAD">@GiviMAD 2022</a>
+  </div>
+  <script src="index.js"></script>
+</body>
+
+</html>
