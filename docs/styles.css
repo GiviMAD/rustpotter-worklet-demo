@@ -45,11 +45,13 @@ body {
 }
 
 .range_container {
-  display: grid;
   width: auto;
   padding: 6px;
 }
-
+.range_container input[type=range] {
+  width: 100%;
+  display: block;
+}
 .check_container {
   width: auto;
   padding: 6px;
@@ -78,13 +80,11 @@ body {
   color: rgb(255, 46, 0);
 }
 
-.copyright {
-  position: absolute;
-  right: 4px;
-  bottom: 2px;
+.author {
+  text-align: right;
 }
 
-.copyright a {
+.author a {
   font-family: Copperplate;
   text-decoration: none;
   color: rgb(70, 150, 153);
