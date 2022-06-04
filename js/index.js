@@ -1,3 +1,5 @@
+const { NoiseDetectionMode } = require('rustpotter-worklet');
+
 /** @typedef { import('rustpotter-worklet').RustpotterService } RustpotterService */
 (async () => {
     const USER_NAME = "rustpotter@Demo";
@@ -5,7 +7,8 @@
         selectedWakeword: null,
         selectedWakewordBytes: null,
         selectedThreshold: 0.5,
-        selectedAvgThreshold: 0.,
+        selectedAvgThreshold: 0.2,
+        selectedNoiseDectection: null,
         eagerMode: true,
         /**
          * @type {RustpotterService}
@@ -18,6 +21,7 @@
         document.querySelector("#wakeword_selector").addEventListener('change', onWakewordSelectionChange);
         document.querySelector("#wakeword_threshold").addEventListener('input', onThresholdInput);
         document.querySelector("#wakeword_avg_threshold").addEventListener('input', onAvgThresholdInput);
+        // document.querySelector("#noise_detection_selector").addEventListener('change', onNoiseDetectionChange);
         document.querySelector("#eager_mode").addEventListener('input', onEagerModeChecked);
         document.querySelector("#record").addEventListener('click', onRecordClick);
         document.querySelector("#pause").addEventListener('click', onPauseClick);
@@ -74,6 +78,8 @@
                 averagedThreshold: state.selectedAvgThreshold,
                 threshold: state.selectedThreshold,
                 eagerMode: state.eagerMode,
+                noiseMode: state.selectedNoiseDectection,
+                noiseSensitivity: 0.5,
             });
             state.rustpotterService.onspot = (name, score) => {
                 printLog(`detection: '${name}'[${score}]`);
@@ -102,6 +108,32 @@
             enableElement("stop");
         } catch (error) {
             printError(error.message ?? err);
+        }
+    }
+    function onNoiseDetectionChange(ev) {
+        const selected_value = ev.target.value;
+        if (selected_value == "none") {
+            state.selectedNoiseDectection = null;
+        } else {
+            let mode = null;
+            switch (selected_value) {
+                case "Easiest":
+                    mode = NoiseDetectionMode.easiest;
+                    break;
+                case "Easy":
+                    mode = NoiseDetectionMode.easy;
+                    break;
+                case "Normal":
+                    mode = NoiseDetectionMode.normal;
+                    break;
+                case "Hard":
+                    mode = NoiseDetectionMode.hard;
+                    break;
+                case "Hardest":
+                    mode = NoiseDetectionMode.hardest;
+                    break;
+            }
+            state.selectedNoiseDectection = mode;
         }
     }
     function onWakewordSelectionChange(ev) {
