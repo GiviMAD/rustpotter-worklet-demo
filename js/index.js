@@ -21,7 +21,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
         document.querySelector("#wakeword_selector").addEventListener('change', onWakewordSelectionChange);
         document.querySelector("#wakeword_threshold").addEventListener('input', onThresholdInput);
         document.querySelector("#wakeword_avg_threshold").addEventListener('input', onAvgThresholdInput);
-        // document.querySelector("#noise_detection_selector").addEventListener('change', onNoiseDetectionChange);
+        document.querySelector("#noise_detection_selector").addEventListener('change', onNoiseDetectionChange);
         document.querySelector("#eager_mode").addEventListener('input', onEagerModeChecked);
         document.querySelector("#record").addEventListener('click', onRecordClick);
         document.querySelector("#pause").addEventListener('click', onPauseClick);
