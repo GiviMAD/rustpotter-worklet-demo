@@ -8,5 +8,5 @@ for VOICE in "${VOICES[@]}" ;do
     -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
     -H "Content-Type: application/json; charset=utf-8" \
     -d "$JSON" \
-    "https://texttospeech.googleapis.com/v1/text:synthesize" | jq -r '.audioContent' | base64 -d > ${TEXT}_g_${VOICE}.wav
+    "https://texttospeech.googleapis.com/v1/text:synthesize" | jq -r '.audioContent' | base64 -d > ${TEXT}_${VOICE}.wav
 done
