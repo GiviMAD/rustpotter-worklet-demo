@@ -89,3 +89,9 @@ body {
   text-decoration: none;
   color: rgb(70, 150, 153);
 }
+.author span {
+  cursor: default;
+  font-family: Copperplate;
+  text-decoration: none;
+  color: rgb(70, 150, 153);
+}

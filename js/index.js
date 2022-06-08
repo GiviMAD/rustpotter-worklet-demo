@@ -168,6 +168,9 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
         printLog("loading available wakewords...");
         enableButtons(false);
         enableOptions(false);
+        var versionLink = document.querySelector("#rustpotter_version");
+        versionLink.innerHTML = "rustpotter-v" + VERSION;
+        versionLink.href = "https://github.com/GiviMAD/rustpotter-cli/releases/tag/v" + VERSION;
         fetch("wakewords.json")
             .then((resp) => resp.json())
             .then((wakewords) => {
@@ -204,7 +207,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
     function enableOptions(enabled) {
         document.querySelector("#wakeword_panel")
             .querySelectorAll("input,select")
-            .forEach(btn => btn.disabled = !enabled);
+            .forEach(el => el.disabled = !enabled);
     }
     function enableButtons(enabled) {
         document.querySelector("#btn_panel")

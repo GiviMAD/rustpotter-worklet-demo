@@ -6,6 +6,5 @@
 
 ## Description
 
-A demo for [Rustpotter](https://github.com/GiviMAD/rustpotter) (a free and open source wake word spotter forged in rust) running in the browser.
+A demo for [Rustpotter](https://github.com/GiviMAD/rustpotter) (an open source wake word spotter forged in rust) running in the browser.
 
-WIP!
