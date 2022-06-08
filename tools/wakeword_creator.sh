@@ -1,4 +1,4 @@
-WAKEWORDS=('oye casa_es-ES' 'hey home_en-US')
+WAKEWORDS=('oye casa_es-ES' 'buenos días_es-ES' 'good morning_en-US' 'hey home_en-US' 'hallo nach hause_de-DE' 'guten morgen_de-DE')
 # set -x;
 set -e;
 echo "### auto generated" > wakeword_build_cli.sh
