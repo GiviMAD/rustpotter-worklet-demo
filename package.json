@@ -1,9 +1,10 @@
 {
   "name": "rustpotter-worklet-demo",
-  "version": "0.16.0",
+  "version": "1.0.0",
   "description": "Demo for rustpotter, an open source wake word spotter forged in rust, running as an audio worklet",
   "main": "dist/index.js",
   "license": "Apache-2.0",
+  "private": true,
   "collaborators": [
     "Miguel Álvarez Díez <miguelwork92@gmail.com>"
   ],
@@ -17,7 +18,7 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
-    "rustpotter-worklet": "0.16.0"
+    "rustpotter-worklet": "1.0.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",
