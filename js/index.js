@@ -100,9 +100,9 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
             };
             await state.rustpotterService.start();
             if (state.selectedWakeword == 'manual') {
-                state.rustpotterService.addWakeword(state.selectedWakewordBytes);
+                await state.rustpotterService.addWakeword(state.selectedWakewordBytes);
             } else {
-                state.rustpotterService.addWakewordByPath(state.selectedWakeword);
+                await state.rustpotterService.addWakewordByPath(state.selectedWakeword);
             }
             enableElement("pause");
             enableElement("stop");
