@@ -8,14 +8,14 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
         selectedWakewordBytes: null,
         selectedThreshold: 0.5,
         selectedAvgThreshold: 0.2,
-        selectedNoiseDectection: null,
+        selectedNoiseDetection: null,
         eagerMode: true,
         /**
          * @type {RustpotterService}
          */
         rustpotterService: null,
     };
-    window.addEventListener('load', onWindowsLoad());
+    window.addEventListener('load', onWindowsLoad);
     try {
         await checkRecordCapabilities();
         document.querySelector("#wakeword_selector").addEventListener('change', onWakewordSelectionChange);
@@ -78,7 +78,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
                 averagedThreshold: state.selectedAvgThreshold,
                 threshold: state.selectedThreshold,
                 eagerMode: state.eagerMode,
-                noiseMode: state.selectedNoiseDectection,
+                noiseMode: state.selectedNoiseDetection,
                 noiseSensitivity: 0.5,
             });
             state.rustpotterService.onspot = (name, score) => {
@@ -113,7 +113,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
     function onNoiseDetectionChange(ev) {
         const selected_value = ev.target.value;
         if (selected_value == "none") {
-            state.selectedNoiseDectection = null;
+            state.selectedNoiseDetection = null;
         } else {
             let mode = null;
             switch (selected_value) {
@@ -133,7 +133,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
                     mode = NoiseDetectionMode.hardest;
                     break;
             }
-            state.selectedNoiseDectection = mode;
+            state.selectedNoiseDetection = mode;
         }
     }
     function onWakewordSelectionChange(ev) {

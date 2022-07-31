@@ -19,26 +19,26 @@
       <br>
     </div>
   </div>
-  <div class="wakeword-panel-outder">
+  <div class="wakeword-panel-outer">
     <div id="wakeword_panel" class="wakeword-panel">
       <span>Wakeword: </span>
       <select disabled="true" id="wakeword_selector">
       </select>
       <div id="wakeword_input_container"></div>
-      <div class="range_container" title="Required score for first step compatation against the averaged wake word features (can be disabled by setting it to 0, but it's recommended as reduces cpu consumption).">
+      <div class="range_container" title="Required score for first step comparison against the averaged wake word features (can be disabled by setting it to 0, but it's recommended as reduces cpu consumption).">
         <label for="averaged_threshold">Averaged Threshold: </label>
         <output>0.2</output>
         <input type="range" id="wakeword_avg_threshold" min="0" max="1" value="0.2" step="0.01"
           oninput="this.previousElementSibling.value = this.value">
       </div>
-      <div class="range_container" title="Required score for compatation against the wake word templates features">
+      <div class="range_container" title="Required score for comparison against the wake word templates features">
         <label for="threshold">Threshold: </label>
         <output>0.5</output>
         <input type="range" id="wakeword_threshold" min="0" max="1" value="0.5" step="0.01"
           oninput="this.previousElementSibling.value = this.value">
       </div>
       <span>Noise detection: </span>
-      <select disabled="true" id="noise_detection_selector" title="Avoid running the wakeword comparation in ausence of noise to reduce cpu consumption.">
+      <select disabled="true" id="noise_detection_selector" title="Avoid running the wakeword comparison in ausence of noise to reduce cpu consumption.">
         <option value="none">None</option>
         <option value="Easiest">Easiest</option>
         <option value="Easy">Easy</option>
