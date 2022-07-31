@@ -18,7 +18,7 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
-    "rustpotter-worklet": "1.0.1"
+    "rustpotter-worklet": "1.0.2"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",
