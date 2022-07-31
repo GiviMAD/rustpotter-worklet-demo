@@ -15,7 +15,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
          */
         rustpotterService: null,
     };
-    window.addEventListener('load', onWindowsLoad);
+    window.addEventListener('load', onWindowsLoad, { once: true });
     try {
         await checkRecordCapabilities();
         document.querySelector("#wakeword_selector").addEventListener('change', onWakewordSelectionChange);
@@ -165,6 +165,7 @@ const { NoiseDetectionMode } = require('rustpotter-worklet');
     }
 
     function onWindowsLoad() {
+        printLog("this is a demo web site for testing the library spot capabilities");
         printLog("loading available wakewords...");
         enableButtons(false);
         enableOptions(false);
