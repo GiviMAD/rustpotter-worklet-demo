@@ -44,17 +44,51 @@ body {
   border-radius: 6px;
 }
 
-.range_container {
+.options_panel {
+  margin: 12px;
+  margin-top: 0px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #d7d7d7;
+}
+
+
+.options_panel label {
+  vertical-align: middle;
+}
+
+.band_pass_panel {
+  display: flex;
+}
+
+.band_pass_panel div:nth-child(2) {
+  margin-left: 6px;
+}
+
+.band_pass_panel input {
+  width: 50px;
+}
+
+.input_container {
   width: auto;
   padding: 6px;
 }
-.range_container input[type=range] {
+
+.input_container input[type=range] {
   width: 100%;
   display: block;
 }
-.check_container {
-  width: auto;
-  padding: 6px;
+
+.input_container input[type=number] {
+  width: 50px;
+}
+
+.input_container label {
+  vertical-align: middle;
+}
+
+.input_container output {
+  vertical-align: middle;
 }
 
 .terminal {
@@ -89,9 +123,14 @@ body {
   text-decoration: none;
   color: rgb(70, 150, 153);
 }
+
 .author span {
   cursor: default;
   font-family: Copperplate;
   text-decoration: none;
   color: rgb(70, 150, 153);
+}
+
+.hidden {
+  display: none;
 }

@@ -1,14 +1,10 @@
 {
-    "hey, home (en-US)": "hey,_home-en_US.rpw",
     "hey home (en-US)": "hey_home-en_US.rpw",
     "good morning (en-US)": "good_morning-en_US.rpw",
-    "oye, casa (es-ES)": "oye,_casa-es_ES.rpw",
     "oye casa (es-ES)": "oye_casa-es_ES.rpw",
     "buenos días (es-ES)": "buenos_días-es_ES.rpw",
-    "hé, maison (fr-FR)": "hé,_maison-fr_FR.rpw",
     "hé maison (fr-FR)": "hé_maison-fr_FR.rpw",
     "bonjour (fr-FR)": "bonjour-fr_FR.rpw",
-    "hallo, hause (de-DE)": "hallo,_hause-de_DE.rpw",
     "hallo hause (de-DE)": "hallo_hause-de_DE.rpw",
     "guten morgen (de-DE)": "guten_morgen-de_DE.rpw"
 }
