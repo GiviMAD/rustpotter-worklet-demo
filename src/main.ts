@@ -3,6 +3,8 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
 (async () => {
     const USER_NAME = "rustpotter@Demo";
     const state = {
+        audioContext: null as AudioContext | null,
+        mediaStream: null as MediaStream | null,
         selectedWakeword: null as string | null,
         selectedWakewordBytes: null as ArrayBuffer | null,
         selectedThreshold: 0.5,
@@ -16,29 +18,10 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
         bandPassHighCutoff: 400 as number | null,
         scoreMode: ScoreMode.max,
         minScores: 10,
+        eager: true,
         rustpotterService: null as RustpotterService | null,
     };
     window.addEventListener('load', onWindowsLoad, { once: true });
-    try {
-        await checkRecordCapabilities();
-        document.querySelector("#wakeword_selector")?.addEventListener('change', onWakewordSelectionChange);
-        document.querySelector("#wakeword_threshold")?.addEventListener('input', onThresholdInput);
-        document.querySelector("#wakeword_avg_threshold")?.addEventListener('input', onAvgThresholdInput);
-        document.querySelector("#score_mode_selector")?.addEventListener('change', onScoreModeChange);
-        document.querySelector("#min_scores")?.addEventListener('input', onMinScoresInput);
-        document.querySelector("#gain_normalizer_check")?.addEventListener('input', onGainNormalizerChecked);
-        document.querySelector("#min_gain")?.addEventListener('input', onMinGainInput);
-        document.querySelector("#max_gain")?.addEventListener('input', onMaxGainInput);
-        document.querySelector("#gain_ref")?.addEventListener('input', onGainRefInput);
-        document.querySelector("#band_pass_check")?.addEventListener('input', onBandPassChecked);
-        document.querySelector("#low_cutoff")?.addEventListener('input', onBandPassLowCutoffInput);
-        document.querySelector("#high_cutoff")?.addEventListener('input', onBandPassHighCutoffInput);
-        document.querySelector("#record")?.addEventListener('click', onRecordClick);
-        document.querySelector("#pause")?.addEventListener('click', onPauseClick);
-        document.querySelector("#stop")?.addEventListener('click', onStopClick());
-    } catch (error) {
-        onError(error);
-    }
     // event listeners
     function onThresholdInput(ev: Event) {
         state.selectedThreshold = Number((ev.target as HTMLInputElement).value);
@@ -97,8 +80,7 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
     function onStopClick() {
         return async () => {
             enableButtons(false);
-            state.rustpotterService?.stop().then(() => state.rustpotterService?.close()).then(() => {
-                state.rustpotterService = null;
+            stopMic().then(() => {
                 enableElement('record');
                 enableOptions(true);
             }).catch(err => {
@@ -106,33 +88,20 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
             });
         };
     }
-    function onPauseClick() {
-        enableButtons(false);
-        state.rustpotterService?.pause().then(() => {
-            enableElement('record');
-        }).catch(err => {
-            printError(err.message ?? err);
-        });
-    }
     async function onRecordClick() {
         try {
             enableElement("record", false);
             enableOptions(false);
-            if (state.rustpotterService != null) {
-                state.rustpotterService.resume();
-                enableElement("pause");
-                enableElement("stop");
-                return;
+            if (state.rustpotterService == null) {
+                throw new Error("Rustpotter not running");
             }
-            const wasmModuleUrl = new URL('../node_modules/rustpotter-worklet/dist/rustpotter_wasm_bg.wasm', import.meta.url);
-            const workletModuleUrl = new URL('../node_modules/rustpotter-worklet/dist/rustpotter-worklet.min.js', import.meta.url);
-            state.rustpotterService = new RustpotterService({
-                workletPath: workletModuleUrl.href,
-                wasmPath: wasmModuleUrl.href,
+            printLog('updating rustpotter config...');
+            await state.rustpotterService.updateConfig({
                 averagedThreshold: state.selectedAvgThreshold,
                 threshold: state.selectedThreshold,
                 scoreMode: state.scoreMode,
                 minScores: state.minScores,
+                eager: state.eager,
                 gainNormalizerEnabled: state.gainNormalizer,
                 minGain: state.minGain,
                 maxGain: state.maxGain,
@@ -141,32 +110,14 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
                 bandPassLowCutoff: state.bandPassLowCutoff ?? 80,
                 bandPassHighCutoff: state.bandPassHighCutoff ?? 400,
             });
-            state.rustpotterService.onspot = (detection) => {
-                const currDate = new Date();
-                let hour = `${currDate.getHours().toString().padStart(2, "0")}:${currDate.getMinutes().toString().padStart(2, "0")}:${currDate.getSeconds().toString().padStart(2, "0")}`;
-                printLog(`[T${hour}] ${JSON.stringify(detection)}`);
-            };
-            state.rustpotterService.onstart = function () {
-                printLog('rustpotterService is started');
-            };
-
-            state.rustpotterService.onstop = function () {
-                printLog('rustpotterService is stopped');
-            };
-
-            state.rustpotterService.onpause = function () {
-                printLog('rustpotterService is paused');
-            };
-            state.rustpotterService.onresume = function () {
-                printLog('rustpotterService is resumed');
-            };
-            await state.rustpotterService.start();
+            printLog('updating rustpotter wakeword...');
+            await state.rustpotterService.removeWakewords();
             if (state.selectedWakeword == 'manual') {
-                if (state.selectedWakewordBytes) await state.rustpotterService.addWakeword(state.selectedWakewordBytes);
+                if (state.selectedWakewordBytes) await state.rustpotterService.addWakeword("_", state.selectedWakewordBytes);
             } else {
-                if (state.selectedWakeword) await state.rustpotterService.addWakewordByPath(state.selectedWakeword);
+                if (state.selectedWakeword) await state.rustpotterService.addWakewordByPath("_", state.selectedWakeword);
             }
-            enableElement("pause");
+            await startMic();
             enableElement("stop");
         } catch (error) {
             onError(error);
@@ -245,9 +196,30 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
         }
         enableElement('record', inputIds.every(id => document.querySelector<HTMLInputElement>(`#${id}`)?.validity.valid));
     }
-    function onWindowsLoad() {
+    async function onWindowsLoad() {
         printLog("this is a demo web site for testing the library spot capabilities");
-        printLog("loading available wakewords...");
+        try {
+            await assertCapabilitiesAvailable();
+            state.audioContext = new AudioContext();
+            await initRustpotter(state.audioContext.sampleRate);
+            document.querySelector("#wakeword_selector")?.addEventListener('change', onWakewordSelectionChange);
+            document.querySelector("#wakeword_threshold")?.addEventListener('input', onThresholdInput);
+            document.querySelector("#wakeword_avg_threshold")?.addEventListener('input', onAvgThresholdInput);
+            document.querySelector("#score_mode_selector")?.addEventListener('change', onScoreModeChange);
+            document.querySelector("#min_scores")?.addEventListener('input', onMinScoresInput);
+            document.querySelector("#gain_normalizer_check")?.addEventListener('input', onGainNormalizerChecked);
+            document.querySelector("#min_gain")?.addEventListener('input', onMinGainInput);
+            document.querySelector("#max_gain")?.addEventListener('input', onMaxGainInput);
+            document.querySelector("#gain_ref")?.addEventListener('input', onGainRefInput);
+            document.querySelector("#band_pass_check")?.addEventListener('input', onBandPassChecked);
+            document.querySelector("#low_cutoff")?.addEventListener('input', onBandPassLowCutoffInput);
+            document.querySelector("#high_cutoff")?.addEventListener('input', onBandPassHighCutoffInput);
+            document.querySelector("#record")?.addEventListener('click', onRecordClick);
+            document.querySelector("#stop")?.addEventListener('click', onStopClick());
+        } catch (error) {
+            onError(error);
+            return;
+        }
         enableButtons(false);
         enableOptions(false);
         const versionLink = document.querySelector<HTMLAnchorElement>("#rustpotter_version");
@@ -255,6 +227,7 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
             versionLink.innerHTML = "rustpotter-v" + APP_VERSION;
             versionLink.href = "https://github.com/GiviMAD/rustpotter-cli/releases/tag/v" + APP_VERSION;
         }
+        printLog("loading available wakewords...");
         fetch("wakewords.json")
             .then((resp) => resp.json())
             .then((wakewords: { [key: string]: string }) => {
@@ -279,13 +252,63 @@ import { RustpotterService, ScoreMode } from "rustpotter-worklet";
     }
 
     // utils
-    async function checkRecordCapabilities() {
-        const { RustpotterService } = await import("rustpotter-worklet");
-        if (!RustpotterService.isRecordingSupported()) {
-            const errorMessage = "Unable to record in this browser :(";
-            alert(errorMessage);
-            throw new Error(errorMessage);
+    async function initRustpotter(sampleRate: number) {
+        const wasmPath = new URL('../node_modules/rustpotter-worklet/dist/rustpotter_wasm_bg.wasm', import.meta.url).toString();
+        const workletPath = new URL('../node_modules/rustpotter-worklet/dist/rustpotter-worklet.min.js', import.meta.url).toString();
+        const workerPath = new URL('../node_modules/rustpotter-worklet/dist/rustpotter-worker.min.js', import.meta.url).toString();
+        state.rustpotterService = await RustpotterService.new(sampleRate, { wasmPath, workerPath, workletPath });
+        state.rustpotterService.onDetection((detection) => {
+            const currDate = new Date();
+            let hour = `${currDate.getHours().toString().padStart(2, "0")}:${currDate.getMinutes().toString().padStart(2, "0")}:${currDate.getSeconds().toString().padStart(2, "0")}`;
+            printLog(`[T${hour}] ${JSON.stringify(detection)}`);
+        });
+        printLog('rustpotter initialized');
+    }
+    async function startMic() {
+        if (!state.rustpotterService || !state.audioContext) {
+            throw new Error("Bad state");
         }
+        printLog('initiating microphone source node');
+        // requires user interaction event
+        const stream = state.mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                autoGainControl: true,
+                echoCancellation: true,
+                noiseSuppression: true,
+            },
+            video: false,
+        });
+        // chain rustpotter audio processor
+        printLog('initializing rustpotter audio node');
+        const rustpotterWorklet = await state.rustpotterService.getProcessorNode(state.audioContext);
+        state.audioContext.createMediaStreamSource(stream).connect(rustpotterWorklet);
+    }
+    async function stopMic() {
+        printLog('stopping microphone source and rustpotter processor');
+        if (!state.mediaStream || !state.rustpotterService) {
+            throw new Error("Bad state");
+        }
+        await state.rustpotterService.disposeProcessorNode();
+        state.mediaStream.getTracks().forEach(track => track.stop());
+        state.mediaStream = null;
+    }
+    async function assertCapabilitiesAvailable() {
+        if (!isRecordSupported()) {
+            throw new Error("Unable to record in this browser :(");
+        }
+        if (!window.WebAssembly) {
+            throw new Error("WebAssembly feature is not available :(");
+        }
+        if (!window.Worklet) {
+            throw new Error("AudioWorklet feature is not available :(");
+        }
+        if (!window.Worker) {
+            throw new Error("Web Worker feature is not available :(");
+        }
+    }
+    function isRecordSupported() {
+        const getUserMediaSupported = !!(window.navigator && window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia);
+        return window.AudioContext && getUserMediaSupported;
     }
     function enableElement(id: string, enabled = true) {
         const el = document.querySelector<any>("#" + id);

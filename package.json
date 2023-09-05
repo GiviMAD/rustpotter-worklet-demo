@@ -1,6 +1,6 @@
 {
   "name": "rustpotter-worklet-demo",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Demo for rustpotter, an open source wakeword spotter forged in rust, running as an audio worklet",
   "main": "dist/index.js",
   "license": "Apache-2.0",
@@ -19,10 +19,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "rustpotter-worklet": "2.0.0"
+    "rustpotter-worklet": "3.0.0"
   },
   "devDependencies": {
-    "typescript": "^4.9.5",
-    "vite": "^4.1.4"
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
   }
 }
